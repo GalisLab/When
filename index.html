@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מתי החופש?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --chalk:#F3FBFC;
+    --muted:#BFE7EC;
+    --yellow:#FFD166;
+    --coral:#FF7A6B;
+    --mint:#79D9A8;
+    --sky:#8FD9F2;
+    --lilac:#CBA6F2;
+    --panel: rgba(6,42,50,0.55);
+    --panel-2: rgba(6,42,50,0.35);
+    --panel-border: rgba(255,255,255,0.22);
+    --outline:#031E24;
+    --bg-gradient:
+      radial-gradient(ellipse 900px 600px at 25% 0%, #8FF0F2 0%, transparent 55%),
+      radial-gradient(ellipse 900px 700px at 85% 100%, #33C7E0 0%, transparent 55%),
+      linear-gradient(165deg, #22D3EE 0%, #10AAC9 40%, #0A7C93 75%, #075A6B 100%);
+  }
+  body.night{
+    --chalk:#EAF2F6;
+    --muted:#8FA6B0;
+    --panel: rgba(255,255,255,0.06);
+    --panel-2: rgba(255,255,255,0.05);
+    --panel-border: rgba(255,255,255,0.14);
+    --outline:#000000;
+    --bg-gradient:
+      radial-gradient(ellipse 900px 600px at 25% 0%, rgba(99,179,237,0.14) 0%, transparent 55%),
+      radial-gradient(ellipse 900px 700px at 85% 100%, rgba(139,92,246,0.10) 0%, transparent 55%),
+      linear-gradient(165deg, #0B1626 0%, #091220 45%, #05090F 100%);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg-gradient);
+    background-attachment:fixed;
+    font-family:'Heebo', sans-serif;
+    color:var(--chalk);
+    display:flex;
+    justify-content:center;
+    padding:2rem 1rem 3rem;
+    transition:background 0.3s;
+  }
+  .app{ width:100%; max-width:480px; }
+
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:1.2rem;
+  }
+  .toolbar .font-controls{ display:flex; gap:0.4rem; }
+  .toolbar button{
+    width:2.4rem;
+    height:2.4rem;
+    border-radius:50%;
+    border:1.5px solid var(--panel-border);
+    background:var(--panel);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    color:var(--chalk);
+    font-weight:700;
+    font-size:0.85rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .toolbar .theme-toggle{ font-size:1.15rem; }
+
+  header{ text-align:center; margin-bottom:1.6rem; }
+  header .doodle{ font-size:2.6rem; display:block; margin-bottom:0.4rem; }
+  header h1{
+    font-family:'Suez One', serif;
+    font-size:clamp(2.6rem, 11vw, 3.6rem);
+    margin:0;
+    color:#fff;
+    -webkit-text-stroke:3.5px var(--outline);
+    paint-order:stroke fill;
+    text-shadow:0 4px 14px rgba(0,0,0,0.25);
+  }
+
+  /* hero */
+  .hero-card{
+    position:relative;
+    background:var(--panel);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1.5px solid var(--panel-border);
+    border-radius:22px;
+    padding:2.2rem 1.5rem 1.7rem;
+    text-align:center;
+    margin:0 auto 1.6rem;
+    max-width:340px;
+    box-shadow:0 18px 34px rgba(4,30,38,0.35);
+  }
+  .hero-number{
+    font-family:'Suez One', serif;
+    font-size:clamp(3.6rem, 17vw, 5.4rem);
+    line-height:1;
+    color:var(--coral);
+    margin:0;
+  }
+  .hero-unit{
+    font-size:1rem;
+    color:var(--muted);
+    margin-top:0.2rem;
+  }
+  .hero-target{
+    margin-top:0.9rem;
+    font-size:1.1rem;
+    font-weight:700;
+    color:var(--yellow);
+    -webkit-text-stroke:1.75px var(--outline);
+    paint-order:stroke fill;
+  }
+  .hero-dates{
+    margin-top:1rem;
+    padding-top:1rem;
+    border-top:1px dashed rgba(255,255,255,0.25);
+  }
+  .hero-dates .item{ margin-bottom:0.95rem; text-align:right; }
+  .hero-dates .item:last-child{ margin-bottom:0; }
+  .hero-dates .item .value{
+    font-size:0.98rem;
+    font-weight:600;
+    color:var(--chalk);
+    line-height:1.55;
+  }
+  .label{
+    display:inline-block;
+    padding:0.26rem 0.8rem;
+    border-radius:999px;
+    font-size:0.95rem;
+    font-weight:700;
+    margin-bottom:0.35rem;
+  }
+  .label-start{ background:var(--coral); color:#123038; }
+  .label-end{ background:var(--sky); color:#123038; }
+  .label-length{ background:var(--yellow); color:#123038; }
+  .label-resume{ background:var(--mint); color:#123038; }
+  .label-note{ background:var(--lilac); color:#123038; }
+
+  /* segmented toggle */
+  .segment{
+    display:flex;
+    background:var(--panel-2);
+    border:1.5px solid var(--panel-border);
+    border-radius:999px;
+    padding:4px;
+    margin:0 auto 1.4rem;
+    max-width:320px;
+  }
+  .segment button{
+    flex:1;
+    border:none;
+    background:transparent;
+    font-family:'Heebo', sans-serif;
+    font-size:0.88rem;
+    font-weight:600;
+    color:var(--chalk);
+    padding:0.55rem 0.4rem;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+  .segment button.active{
+    background:var(--yellow);
+    color:#123038;
+    box-shadow:0 2px 6px rgba(0,0,0,0.25);
+  }
+
+  section.block{ margin-bottom:1.6rem; }
+  section.block h2{
+    font-family:'Heebo', sans-serif;
+    font-size:1.1rem;
+    font-weight:700;
+    margin:0 0 0.6rem;
+    color:#fff;
+    -webkit-text-stroke:2px var(--outline);
+    paint-order:stroke fill;
+    letter-spacing:0.2px;
+  }
+  section.block .sub{
+    font-size:0.8rem;
+    color:var(--muted);
+    margin:-0.3rem 0 0.7rem;
+  }
+
+  /* chips */
+  .chips{
+    display:flex;
+    gap:0.5rem;
+    overflow-x:auto;
+    padding-bottom:0.4rem;
+    scrollbar-width:thin;
+  }
+  .chip{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:0.35rem;
+    background:var(--panel);
+    border:1.5px solid var(--panel-border);
+    border-right:4px solid var(--dot, var(--yellow));
+    border-radius:999px;
+    padding:0.5rem 0.9rem;
+    font-size:0.85rem;
+    font-weight:500;
+    color:var(--chalk);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:transform 0.15s, background 0.15s;
+  }
+  .chip:hover{ transform:translateY(-1px); }
+  .chip.active{
+    background:var(--dot, var(--yellow));
+    color:#123038;
+    border-color:transparent;
+  }
+  .chip .emoji{ font-size:1rem; }
+
+  .custom-date-row{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    gap:0.4rem;
+    margin-top:0.7rem;
+  }
+  .custom-date-row .field{
+    display:flex;
+    flex-direction:column;
+    gap:0.2rem;
+  }
+  .custom-date-row .field label{
+    font-size:0.72rem;
+    font-weight:600;
+    color:var(--chalk);
+    opacity:0.6;
+    text-align:center;
+  }
+  .custom-date-row input[type="number"]{
+    width:100%;
+    font-family:'Heebo', sans-serif;
+    font-size:0.9rem;
+    font-weight:600;
+    text-align:center;
+    padding:0.5rem 0.3rem;
+    border-radius:10px;
+    border:1.5px solid var(--panel-border);
+    background:var(--panel);
+    color:var(--chalk);
+  }
+  .custom-date-row input[type="number"]::placeholder{
+    color:var(--chalk);
+    opacity:0.5;
+    font-weight:400;
+  }
+  .custom-date-row .field.day, .custom-date-row .field.month{ width:4.2rem; }
+  .custom-date-row .field.year{ width:5.2rem; }
+  .custom-date-row button{
+    align-self:flex-end;
+    font-family:'Heebo', sans-serif;
+    font-weight:600;
+    font-size:0.85rem;
+    border:none;
+    border-radius:10px;
+    padding:0.6rem 1.1rem;
+    background:var(--coral);
+    color:#123038;
+    cursor:pointer;
+  }
+
+  /* personal workdays */
+  .days-picker{
+    display:flex;
+    justify-content:space-between;
+    gap:0.4rem;
+  }
+  .day-toggle{
+    flex:1;
+    aspect-ratio:1;
+    border-radius:50%;
+    border:1.5px solid var(--panel-border);
+    background:var(--panel);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.85rem;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+    transition:background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .day-toggle.active{
+    background:var(--mint);
+    border-color:var(--mint);
+    color:#123038;
+  }
+
+  /* overview list */
+  .overview{
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+  }
+  .overview-row{
+    background:var(--panel);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1.5px solid transparent;
+    border-right:4px solid var(--dot, var(--yellow));
+    border-radius:16px;
+    padding:0.75rem 0.9rem;
+    cursor:pointer;
+    transition:border-color 0.15s;
+  }
+  .overview-row.active{ border-color:var(--yellow); border-right-color:var(--dot, var(--yellow)); }
+  .overview-row .top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .overview-row .name{
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+    font-size:0.9rem;
+    font-weight:500;
+  }
+  .overview-row .workdays-note{
+    font-size:0.68rem;
+    color:var(--muted);
+    margin-top:0.2rem;
+    text-align:right;
+  }
+  .overview-row .next-holiday-note{
+    font-size:0.62rem;
+    color:var(--muted);
+    opacity:0.8;
+    margin-top:0.15rem;
+    text-align:right;
+  }
+  .overview-row .count{
+    font-family:'Suez One', serif;
+    font-size:1.05rem;
+    color:var(--coral);
+  }
+  .overview-row .count span{
+    font-family:'Heebo', sans-serif;
+    font-size:0.72rem;
+    color:var(--muted);
+    font-weight:400;
+    margin-right:0.2rem;
+  }
+  .overview-row .detail{
+    margin-top:0.55rem;
+    padding-top:0.55rem;
+    border-top:1px dashed rgba(255,255,255,0.2);
+  }
+  .overview-row .detail .item{ margin-bottom:0.55rem; text-align:right; }
+  .overview-row .detail .item:last-child{ margin-bottom:0; }
+  .overview-row .detail .label{ font-size:0.74rem; padding:0.18rem 0.6rem; margin-bottom:0.25rem; }
+  .overview-row .detail .value{ font-size:0.8rem; font-weight:500; color:var(--chalk); line-height:1.45; }
+
+  footer.signature{
+    text-align:center;
+    margin-top:0.4rem;
+    font-size:0.8rem;
+    font-weight:600;
+    color:rgba(255,255,255,0.75);
+  }
+  .disclaimer{
+    text-align:center;
+    margin-top:0.5rem;
+    font-size:0.62rem;
+    color:rgba(255,255,255,0.45);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="toolbar">
+    <div class="font-controls">
+      <button id="fontDown" aria-label="הקטן טקסט">א-</button>
+      <button id="fontUp" aria-label="הגדל טקסט">א+</button>
+    </div>
+    <button id="themeToggle" class="theme-toggle" aria-label="מצב לילה">🌙</button>
+  </div>
+
+  <header>
+    <span class="doodle">🧮</span>
+    <h1>מתי החופש?</h1>
+  </header>
+
+  <div class="hero-card">
+    <p class="hero-number" id="heroNumber">0</p>
+    <p class="hero-unit" id="heroUnit">ימים</p>
+    <p class="hero-target" id="heroTarget">עד סוכות</p>
+    <div class="hero-dates" id="heroDates"></div>
+  </div>
+
+  <div class="segment" id="modeToggle">
+    <button data-mode="total" class="active">כל הימים</button>
+    <button data-mode="work">ימי עבודה בלבד</button>
+  </div>
+
+  <section class="block">
+    <h2>כמה נשאר עד?</h2>
+    <div class="chips" id="chipsRow"></div>
+    <div class="custom-date-row" id="customDateRow" style="display:none;">
+      <div class="field day"><label>יום</label><input type="number" id="customDay" min="1" max="31" placeholder="11"></div>
+      <div class="field month"><label>חודש</label><input type="number" id="customMonth" min="1" max="12" placeholder="9"></div>
+      <div class="field year"><label>שנה</label><input type="number" id="customYear" min="2026" max="2030" placeholder="2026"></div>
+      <button id="customDateGo">כמה נשאר?</button>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>ימי העבודה שלי</h2>
+    <div class="days-picker" id="daysPicker"></div>
+  </section>
+
+  <section class="block">
+    <h2>מבט מהיר על כל החופשות</h2>
+    <div class="overview" id="overviewList"></div>
+  </section>
+
+  <footer class="signature">נוצר ע"י גלי</footer>
+  <p class="disclaimer">⚠️ בדיקת נכונות התאריכים היא על אחריותכם.</p>
+
+</div>
+
+<script>
+const DAY_LETTERS = ['א','ב','ג','ד','ה','ו','ש'];
+
+// start: first day off. end: last day off (omit if same as start). resume: first day back at school.
+// resumeNote: use instead of resume when the break flows straight into the next one (no dated return).
+const VACATIONS = [
+  { id:'rosh-hashana', label:'ראש השנה',            emoji:'🍎', dot:'yellow', start:'2026-09-11', end:'2026-09-13', resume:'2026-09-14' },
+  { id:'kippur-sukkot',label:'יום כיפור וסוכות',     emoji:'📯⛺', dot:'lilac', start:'2026-09-20', end:'2026-10-03', resume:'2026-10-04' },
+  { id:'elections',    label:'יום הבחירות',          emoji:'🗳️', dot:'sky',   start:'2026-10-27', end:'2026-10-27' },
+  { id:'chanukah',     label:'חנוכה',                emoji:'🕎', dot:'sky',    start:'2026-12-06', end:'2026-12-12', resume:'2026-12-13' },
+  { id:'purim',        label:'פורים',                emoji:'🎭', dot:'lilac',  start:'2027-03-23', end:'2027-03-24', resume:'2027-03-25' },
+  { id:'pesach',       label:'פסח',                  emoji:'🍷', dot:'coral',  start:'2027-04-13', end:'2027-04-28', resume:'2027-04-29' },
+  { id:'atzmaut',      label:'יום העצמאות',          emoji:'🎆', dot:'sky',    start:'2027-05-12', end:'2027-05-12', resume:'2027-05-13' },
+  { id:'shavuot',      label:'שבועות',               emoji:'🌾', dot:'mint',   start:'2027-06-10', end:'2027-06-11', resume:'2027-06-13' },
+  { id:'end-of-year',  label:'סוף שנת הלימודים',     emoji:'📚', dot:'lilac',  start:'2027-06-30', end:'2027-06-30' },
+  { id:'camp',         label:'חופש גדול / קייטנה',   emoji:'🏕️', dot:'mint',  start:'2027-07-01', end:'2027-07-31' },
+  { id:'summer',       label:'חופש גדול',            emoji:'☀️', dot:'yellow', start:'2027-08-01', end:'2027-08-01' },
+];
+
+const DOT_COLORS = { yellow:'var(--yellow)', mint:'var(--mint)', sky:'var(--sky)', lilac:'var(--lilac)', coral:'var(--coral)' };
+
+let state = {
+  mode: 'total',
+  selectedId: null,
+  customDate: null,
+  workdays: [true,true,true,true,true,true,false], // default: school week, Sunday to Friday
+  theme: 'day',
+  fontScale: 100,
+};
+
+function todayMidnight(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function parseDate(str){
+  const [y,m,day] = str.split('-').map(Number);
+  const d = new Date(y, m-1, day);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function totalDaysBetween(from, to){
+  const ms = to.getTime() - from.getTime();
+  return Math.round(ms / 86400000);
+}
+
+function workdaysBetween(from, to, workdaysSet){
+  if(to <= from) return 0;
+  let count = 0;
+  const cursor = new Date(from);
+  cursor.setDate(cursor.getDate() + 1);
+  while(cursor <= to){
+    if(workdaysSet[cursor.getDay()]) count++;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return count;
+}
+
+// weekday and date on two separate lines, day-month-year order
+function weekdayDateHTML(d){
+  const weekday = d.toLocaleDateString('he-IL', { weekday:'long' });
+  const rest = d.toLocaleDateString('he-IL', { day:'numeric', month:'long', year:'numeric' });
+  return `${weekday}<br>${rest}`;
+}
+function plainDate(d){
+  return d.toLocaleDateString('he-IL', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function nearestUpcoming(){
+  const today = todayMidnight();
+  const upcoming = VACATIONS
+    .map(v => ({...v, d: parseDate(v.start)}))
+    .filter(v => v.d >= today)
+    .sort((a,b) => a.d - b.d);
+  return upcoming.length ? upcoming[0] : VACATIONS[VACATIONS.length-1];
+}
+
+function currentTarget(){
+  if(state.selectedId === 'custom' && state.customDate){
+    return { id:'custom', label:'התאריך שבחרת', emoji:'📌', dot:'coral', start: state.customDate };
+  }
+  return VACATIONS.find(v => v.id === state.selectedId) || nearestUpcoming();
+}
+
+// build the date items: first day off, last day off, return to school (or a note)
+function dateItemsHTML(v){
+  const items = [];
+  const startD = parseDate(v.start);
+  const endD = parseDate(v.end || v.start);
+
+  items.push(['start', 'היום הראשון של החופשה', weekdayDateHTML(startD)]);
+  items.push(['end', 'היום האחרון של החופשה', weekdayDateHTML(endD)]);
+  const length = totalDaysBetween(startD, endD) + 1;
+  if(length > 1){
+    items.push(['length', 'כמה ימי חופש', `${length} ימים`]);
+  }
+  if(v.resume){
+    items.push(['resume', 'חזרה ללימודים', weekdayDateHTML(parseDate(v.resume))]);
+  } else if(v.resumeNote){
+    items.push(['note', 'חזרה ללימודים', v.resumeNote]);
+  }
+  return items.map(([type, label, val]) =>
+    `<div class="item"><span class="label label-${type}">${label}</span><div class="value">${val}</div></div>`
+  ).join('');
+}
+
+function render(){
+  const today = todayMidnight();
+  const target = currentTarget();
+  const targetDate = parseDate(target.start);
+
+  const total = totalDaysBetween(today, targetDate);
+  const work = workdaysBetween(today, targetDate, state.workdays);
+  const value = state.mode === 'work' ? work : total;
+
+  const heroNumber = document.getElementById('heroNumber');
+  const heroUnit = document.getElementById('heroUnit');
+  const heroTarget = document.getElementById('heroTarget');
+  const heroDates = document.getElementById('heroDates');
+
+  if(total < 0){
+    heroNumber.textContent = '🎉';
+    heroUnit.textContent = 'כבר עבר';
+  } else if(total === 0){
+    heroNumber.textContent = '0';
+    heroUnit.textContent = state.mode === 'work' ? 'ימי עבודה, זה קורה היום' : 'ימים, זה קורה היום';
+  } else {
+    heroNumber.textContent = value;
+    heroUnit.textContent = state.mode === 'work' ? 'ימי עבודה' : 'ימים';
+  }
+  heroTarget.textContent = 'עד ' + target.label;
+  heroDates.innerHTML = dateItemsHTML(target);
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.id === (target.id === 'custom' ? 'custom' : target.id));
+  });
+  document.querySelectorAll('.overview-row').forEach(row => {
+    row.classList.toggle('active', row.dataset.id === target.id);
+  });
+
+  renderOverview(today);
+}
+
+function nextHolidayNote(v){
+  const idx = VACATIONS.findIndex(x => x.id === v.id);
+  const next = VACATIONS[idx + 1];
+  if(!next) return '';
+  const fromD = parseDate(v.end || v.start);
+  const toD = parseDate(next.start);
+  toD.setDate(toD.getDate() - 1);
+  const work = workdaysBetween(fromD, toD, state.workdays);
+  return `<div class="next-holiday-note">החג הבא: ${next.label}. ימי עבודה מ${v.label} עד ${next.label}: ${work}</div>`;
+}
+
+function renderOverview(today){
+  const list = document.getElementById('overviewList');
+  list.innerHTML = '';
+  VACATIONS.forEach(v => {
+    const d = parseDate(v.start);
+    const total = totalDaysBetween(today, d);
+    const work = workdaysBetween(today, d, state.workdays);
+    const value = state.mode === 'work' ? work : total;
+    const row = document.createElement('div');
+    row.className = 'overview-row';
+    row.dataset.id = v.id;
+    row.style.setProperty('--dot', DOT_COLORS[v.dot] || 'var(--yellow)');
+    const label = total < 0 ? 'עבר' : (total === 0 ? 'היום' : value);
+    const unit = total <= 0 ? '' : (state.mode === 'work' ? 'ימי עבודה' : 'ימים');
+    const workNote = (total > 0 && state.mode !== 'work')
+      ? `<div class="workdays-note">${work} ימי עבודה עד אז</div>`
+      : '';
+    row.innerHTML = `
+      <div class="top">
+        <span class="name"><span>${v.emoji}</span>${v.label}</span>
+        <span class="count">${label}<span>${unit}</span></span>
+      </div>
+      ${workNote}
+      ${nextHolidayNote(v)}
+      <div class="detail">${dateItemsHTML(v)}</div>
+    `;
+    row.addEventListener('click', () => {
+      state.selectedId = v.id;
+      saveSelection();
+      render();
+    });
+    list.appendChild(row);
+  });
+}
+
+function buildChips(){
+  const row = document.getElementById('chipsRow');
+  row.innerHTML = '';
+  VACATIONS.forEach(v => {
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.dataset.id = v.id;
+    chip.style.setProperty('--dot', DOT_COLORS[v.dot] || 'var(--yellow)');
+    chip.innerHTML = `<span class="emoji">${v.emoji}</span>${v.label}`;
+    chip.addEventListener('click', () => {
+      state.selectedId = v.id;
+      document.getElementById('customDateRow').style.display = 'none';
+      saveSelection();
+      render();
+    });
+    row.appendChild(chip);
+  });
+  const customChip = document.createElement('button');
+  customChip.className = 'chip';
+  customChip.dataset.id = 'custom';
+  customChip.style.setProperty('--dot', 'var(--coral)');
+  customChip.innerHTML = `<span class="emoji">📌</span>תאריך אחר`;
+  customChip.addEventListener('click', () => {
+    document.getElementById('customDateRow').style.display = 'flex';
+  });
+  row.appendChild(customChip);
+}
+
+function buildDaysPicker(){
+  const picker = document.getElementById('daysPicker');
+  picker.innerHTML = '';
+  DAY_LETTERS.forEach((letter, idx) => {
+    const btn = document.createElement('div');
+    btn.className = 'day-toggle' + (state.workdays[idx] ? ' active' : '');
+    btn.textContent = letter;
+    btn.addEventListener('click', () => {
+      state.workdays[idx] = !state.workdays[idx];
+      btn.classList.toggle('active');
+      saveWorkdays();
+      render();
+    });
+    picker.appendChild(btn);
+  });
+}
+
+function buildModeToggle(){
+  document.querySelectorAll('#modeToggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.mode = btn.dataset.mode;
+      document.querySelectorAll('#modeToggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      saveMode();
+      render();
+    });
+  });
+}
+
+document.getElementById('customDateGo').addEventListener('click', () => {
+  const day = parseInt(document.getElementById('customDay').value, 10);
+  const month = parseInt(document.getElementById('customMonth').value, 10);
+  const year = parseInt(document.getElementById('customYear').value, 10);
+  if(!day || !month || !year) return;
+  const mm = String(month).padStart(2,'0');
+  const dd = String(day).padStart(2,'0');
+  state.selectedId = 'custom';
+  state.customDate = `${year}-${mm}-${dd}`;
+  saveSelection();
+  render();
+});
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  state.theme = state.theme === 'night' ? 'day' : 'night';
+  applyTheme();
+  saveTheme();
+});
+document.getElementById('fontUp').addEventListener('click', () => {
+  state.fontScale = Math.min(130, state.fontScale + 10);
+  applyFontScale();
+  saveFontScale();
+});
+document.getElementById('fontDown').addEventListener('click', () => {
+  state.fontScale = Math.max(80, state.fontScale - 10);
+  applyFontScale();
+  saveFontScale();
+});
+
+function applyTheme(){
+  document.body.classList.toggle('night', state.theme === 'night');
+  document.getElementById('themeToggle').textContent = state.theme === 'night' ? '☀️' : '🌙';
+}
+function applyFontScale(){
+  document.documentElement.style.fontSize = state.fontScale + '%';
+}
+
+async function saveWorkdays(){
+  try{ await window.storage.set('workdays', JSON.stringify(state.workdays), false); }catch(e){}
+}
+async function saveMode(){
+  try{ await window.storage.set('mode', state.mode, false); }catch(e){}
+}
+async function saveSelection(){
+  try{
+    await window.storage.set('selection', JSON.stringify({ id: state.selectedId, customDate: state.customDate }), false);
+  }catch(e){}
+}
+async function saveTheme(){
+  try{ await window.storage.set('theme', state.theme, false); }catch(e){}
+}
+async function saveFontScale(){
+  try{ await window.storage.set('fontScale', String(state.fontScale), false); }catch(e){}
+}
+
+async function loadState(){
+  try{
+    const wd = await window.storage.get('workdays', false);
+    if(wd && wd.value) state.workdays = JSON.parse(wd.value);
+  }catch(e){}
+  try{
+    const md = await window.storage.get('mode', false);
+    if(md && md.value) state.mode = md.value;
+  }catch(e){}
+  try{
+    const sel = await window.storage.get('selection', false);
+    if(sel && sel.value){
+      const parsed = JSON.parse(sel.value);
+      state.selectedId = parsed.id;
+      state.customDate = parsed.customDate;
+    }
+  }catch(e){}
+  try{
+    const th = await window.storage.get('theme', false);
+    if(th && th.value) state.theme = th.value;
+  }catch(e){}
+  try{
+    const fs = await window.storage.get('fontScale', false);
+    if(fs && fs.value) state.fontScale = parseInt(fs.value, 10);
+  }catch(e){}
+}
+
+async function init(){
+  await loadState();
+  applyTheme();
+  applyFontScale();
+  buildChips();
+  buildDaysPicker();
+  buildModeToggle();
+  document.querySelectorAll('#modeToggle button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === state.mode);
+  });
+  if(state.selectedId === 'custom' && state.customDate){
+    document.getElementById('customDateRow').style.display = 'flex';
+    const [y,m,d] = state.customDate.split('-');
+    document.getElementById('customDay').value = parseInt(d,10);
+    document.getElementById('customMonth').value = parseInt(m,10);
+    document.getElementById('customYear').value = parseInt(y,10);
+  }
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
