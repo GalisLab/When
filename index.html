@@ -325,6 +325,17 @@
   }
   .chip .emoji{ font-size:1rem; }
 
+  .chip-custom{
+    border-style:dashed;
+    border-width:2px;
+    border-right-style:dashed;
+    background:transparent;
+  }
+  .chip-custom.active{
+    background:var(--dot, var(--coral));
+    border-style:solid;
+  }
+
   .custom-date-row{
     display:flex;
     flex-wrap:wrap;
@@ -763,6 +774,17 @@ function renderOverview(today){
 function buildChips(){
   const row = document.getElementById('chipsRow');
   row.innerHTML = '';
+
+  const customChip = document.createElement('button');
+  customChip.className = 'chip chip-custom';
+  customChip.dataset.id = 'custom';
+  customChip.style.setProperty('--dot', 'var(--coral)');
+  customChip.innerHTML = `<span class="emoji">📌</span>תאריך אחר`;
+  customChip.addEventListener('click', () => {
+    document.getElementById('customDateRow').style.display = 'flex';
+  });
+  row.appendChild(customChip);
+
   VACATIONS.forEach(v => {
     const chip = document.createElement('button');
     chip.className = 'chip';
@@ -777,15 +799,6 @@ function buildChips(){
     });
     row.appendChild(chip);
   });
-  const customChip = document.createElement('button');
-  customChip.className = 'chip';
-  customChip.dataset.id = 'custom';
-  customChip.style.setProperty('--dot', 'var(--coral)');
-  customChip.innerHTML = `<span class="emoji">📌</span>תאריך אחר`;
-  customChip.addEventListener('click', () => {
-    document.getElementById('customDateRow').style.display = 'flex';
-  });
-  row.appendChild(customChip);
 }
 
 function buildDaysPicker(){
