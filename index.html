@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>מתי החופש?</title>
+<meta name="description" content="מחשבון ספירה לאחור לחופשות ולחגים, המותאם לבתי ספר יסודיים שפועלים שישה ימים בשבוע. אפשר לספור את כל הימים או רק את ימי העבודה שלך בפועל.">
+<meta property="og:title" content="מתי החופש?">
+<meta property="og:description" content="מחשבון ספירה לאחור לחופשות ולחגים, המותאם לבתי ספר יסודיים שפועלים שישה ימים בשבוע.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="מתי החופש?">
+<meta name="twitter:description" content="מחשבון ספירה לאחור לחופשות ולחגים, המותאם לבתי ספר יסודיים שפועלים שישה ימים בשבוע.">
+<meta name="twitter:image" content="og-image.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<meta name="theme-color" content="#10AAC9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="מתי החופש?">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -76,6 +93,35 @@
   }
   .toolbar .theme-toggle{ font-size:1.15rem; }
 
+  .ios-install-note{
+    position:relative;
+    background:var(--panel);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1.5px solid var(--panel-border);
+    border-radius:14px;
+    padding:0.7rem 2.2rem 0.7rem 0.9rem;
+    margin-bottom:1rem;
+    font-size:0.8rem;
+    line-height:1.5;
+    color:var(--chalk);
+  }
+  .ios-install-note .share-icon{ font-size:0.9rem; }
+  .ios-install-note #iosInstallClose{
+    position:absolute;
+    top:0.5rem;
+    left:0.6rem;
+    background:transparent;
+    border:none;
+    color:var(--chalk);
+    opacity:0.6;
+    font-size:0.9rem;
+    cursor:pointer;
+    padding:0;
+    width:auto;
+    height:auto;
+  }
+
   header{ text-align:center; margin-bottom:1.6rem; }
   header .doodle{ font-size:2.6rem; display:block; margin-bottom:0.4rem; }
   header h1{
@@ -87,6 +133,57 @@
     paint-order:stroke fill;
     text-shadow:0 4px 14px rgba(0,0,0,0.25);
   }
+
+  header .subtitle{
+    font-size:0.85rem;
+    color:var(--chalk);
+    opacity:0.85;
+    max-width:340px;
+    margin:0.5rem auto 0;
+    line-height:1.5;
+  }
+
+  .how-it-works{
+    background:var(--panel);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1.5px solid var(--panel-border);
+    border-radius:16px;
+    padding:0.7rem 1rem;
+    margin:0.9rem auto 0;
+    max-width:340px;
+    text-align:right;
+  }
+  .how-it-works summary{
+    cursor:pointer;
+    font-weight:700;
+    font-size:0.9rem;
+    color:var(--chalk);
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .how-it-works summary::-webkit-details-marker{ display:none; }
+  .how-it-works summary::after{
+    content:'▾';
+    font-size:0.8rem;
+    color:var(--muted);
+    transition:transform 0.2s;
+    margin-right:0.4rem;
+  }
+  .how-it-works[open] summary::after{ transform:rotate(180deg); }
+  .how-it-works ul{
+    margin:0.7rem 0 0.1rem;
+    padding-right:1.1rem;
+    font-size:0.82rem;
+    color:var(--chalk);
+    opacity:0.9;
+    line-height:1.6;
+  }
+  .how-it-works ul li{ margin-bottom:0.5rem; }
+  .how-it-works ul li:last-child{ margin-bottom:0; }
+  .how-it-works ul li strong{ color:var(--yellow); }
 
   /* hero */
   .hero-card{
@@ -286,6 +383,7 @@
     gap:0.4rem;
   }
   .day-toggle{
+    position:relative;
     flex:1;
     aspect-ratio:1;
     border-radius:50%;
@@ -303,6 +401,22 @@
   .day-toggle.active{
     background:var(--mint);
     border-color:var(--mint);
+    color:#123038;
+  }
+  .day-check{
+    position:absolute;
+    top:-4px;
+    left:-4px;
+    width:1.05rem;
+    height:1.05rem;
+    border-radius:50%;
+    background:var(--mint);
+    border:1.5px solid var(--outline);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.6rem;
+    font-weight:700;
     color:#123038;
   }
 
@@ -394,12 +508,27 @@
       <button id="fontDown" aria-label="הקטן טקסט">א-</button>
       <button id="fontUp" aria-label="הגדל טקסט">א+</button>
     </div>
+    <button id="installBtn" class="theme-toggle" aria-label="התקן אפליקציה" style="display:none;">⬇️</button>
     <button id="themeToggle" class="theme-toggle" aria-label="מצב לילה">🌙</button>
+  </div>
+
+  <div id="iosInstallNote" class="ios-install-note" style="display:none;">
+    להוסיף את האתר למסך הבית: לוחצים על כפתור השיתוף <span class="share-icon">⬆️</span> בסרגל של ספארי, ואז על "הוסף למסך הבית".
+    <button id="iosInstallClose" aria-label="סגור">✕</button>
   </div>
 
   <header>
     <span class="doodle">🧮</span>
     <h1>מתי החופש?</h1>
+    <p class="subtitle">מחשבון ספירה לאחור לחופשות ולחגים, המותאם לבתי ספר יסודיים שפועלים שישה ימים בשבוע.</p>
+    <details class="how-it-works">
+      <summary>איך זה עובד?</summary>
+      <ul>
+        <li><strong>ימי עבודה בלבד</strong>: סופר רק את ימי העבודה בפועל. מסמנים בעיגולים למטה את ימי העבודה השבועיים שלך, והספירה תתעדכן לפי הימים שבחרת.</li>
+        <li><strong>כל הימים</strong>: סופר את כל הימים.</li>
+        <li><strong>תאריך אחר</strong>: אפשר לבחור כל תאריך שרוצים במקום החגים המובנים.</li>
+      </ul>
+    </details>
   </header>
 
   <div class="hero-card">
@@ -665,10 +794,19 @@ function buildDaysPicker(){
   DAY_LETTERS.forEach((letter, idx) => {
     const btn = document.createElement('div');
     btn.className = 'day-toggle' + (state.workdays[idx] ? ' active' : '');
-    btn.textContent = letter;
+    btn.innerHTML = letter + (state.workdays[idx] ? '<span class="day-check">✓</span>' : '');
     btn.addEventListener('click', () => {
       state.workdays[idx] = !state.workdays[idx];
       btn.classList.toggle('active');
+      const existing = btn.querySelector('.day-check');
+      if(state.workdays[idx] && !existing){
+        const check = document.createElement('span');
+        check.className = 'day-check';
+        check.textContent = '✓';
+        btn.appendChild(check);
+      } else if(!state.workdays[idx] && existing){
+        existing.remove();
+      }
       saveWorkdays();
       render();
     });
@@ -725,49 +863,99 @@ function applyFontScale(){
   document.documentElement.style.fontSize = state.fontScale + '%';
 }
 
-async function saveWorkdays(){
-  try{ await window.storage.set('workdays', JSON.stringify(state.workdays), false); }catch(e){}
+const STORAGE_PREFIX = 'matai-hachofesh:';
+
+function saveWorkdays(){
+  try{ localStorage.setItem(STORAGE_PREFIX + 'workdays', JSON.stringify(state.workdays)); }catch(e){}
 }
-async function saveMode(){
-  try{ await window.storage.set('mode', state.mode, false); }catch(e){}
+function saveMode(){
+  try{ localStorage.setItem(STORAGE_PREFIX + 'mode', state.mode); }catch(e){}
 }
-async function saveSelection(){
+function saveSelection(){
   try{
-    await window.storage.set('selection', JSON.stringify({ id: state.selectedId, customDate: state.customDate }), false);
+    localStorage.setItem(STORAGE_PREFIX + 'selection', JSON.stringify({ id: state.selectedId, customDate: state.customDate }));
   }catch(e){}
 }
-async function saveTheme(){
-  try{ await window.storage.set('theme', state.theme, false); }catch(e){}
+function saveTheme(){
+  try{ localStorage.setItem(STORAGE_PREFIX + 'theme', state.theme); }catch(e){}
 }
-async function saveFontScale(){
-  try{ await window.storage.set('fontScale', String(state.fontScale), false); }catch(e){}
+function saveFontScale(){
+  try{ localStorage.setItem(STORAGE_PREFIX + 'fontScale', String(state.fontScale)); }catch(e){}
 }
 
-async function loadState(){
+function loadState(){
   try{
-    const wd = await window.storage.get('workdays', false);
-    if(wd && wd.value) state.workdays = JSON.parse(wd.value);
+    const wd = localStorage.getItem(STORAGE_PREFIX + 'workdays');
+    if(wd) state.workdays = JSON.parse(wd);
   }catch(e){}
   try{
-    const md = await window.storage.get('mode', false);
-    if(md && md.value) state.mode = md.value;
+    const md = localStorage.getItem(STORAGE_PREFIX + 'mode');
+    if(md) state.mode = md;
   }catch(e){}
   try{
-    const sel = await window.storage.get('selection', false);
-    if(sel && sel.value){
-      const parsed = JSON.parse(sel.value);
+    const sel = localStorage.getItem(STORAGE_PREFIX + 'selection');
+    if(sel){
+      const parsed = JSON.parse(sel);
       state.selectedId = parsed.id;
       state.customDate = parsed.customDate;
     }
   }catch(e){}
   try{
-    const th = await window.storage.get('theme', false);
-    if(th && th.value) state.theme = th.value;
+    const th = localStorage.getItem(STORAGE_PREFIX + 'theme');
+    if(th) state.theme = th;
   }catch(e){}
   try{
-    const fs = await window.storage.get('fontScale', false);
-    if(fs && fs.value) state.fontScale = parseInt(fs.value, 10);
+    const fs = localStorage.getItem(STORAGE_PREFIX + 'fontScale');
+    if(fs) state.fontScale = parseInt(fs, 10);
   }catch(e){}
+}
+
+
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBtn.style.display = 'flex';
+});
+
+installBtn.addEventListener('click', async () => {
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBtn.style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+  installBtn.style.display = 'none';
+});
+
+function isIos(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function isInStandaloneMode(){
+  return ('standalone' in navigator && navigator.standalone) ||
+    window.matchMedia('(display-mode: standalone)').matches;
+}
+
+const iosNote = document.getElementById('iosInstallNote');
+if(isIos() && !isInStandaloneMode() && !localStorage.getItem('iosInstallNoteDismissed')){
+  // localStorage is not reliably available in all embedding contexts; guard with try/catch
+  try{
+    iosNote.style.display = 'block';
+  }catch(e){}
+}
+document.getElementById('iosInstallClose').addEventListener('click', () => {
+  iosNote.style.display = 'none';
+  try{ localStorage.setItem('iosInstallNoteDismissed', '1'); }catch(e){}
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
 }
 
 async function init(){
