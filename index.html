@@ -431,6 +431,94 @@
     color:#123038;
   }
 
+  /* month calendar */
+  .calendar-toggle{
+    font-family:'Heebo', sans-serif;
+    font-weight:600;
+    font-size:0.85rem;
+    border:1.5px dashed var(--panel-border);
+    border-radius:999px;
+    padding:0.55rem 1.1rem;
+    background:transparent;
+    color:var(--chalk);
+    cursor:pointer;
+  }
+  .calendar-toggle.active{
+    border-style:solid;
+    background:var(--panel);
+  }
+  .month-calendar{ margin-top:0.9rem; }
+  .month-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:0.7rem;
+  }
+  .month-nav button{
+    width:2.1rem;
+    height:2.1rem;
+    border-radius:50%;
+    border:1.5px solid var(--panel-border);
+    background:var(--panel);
+    color:var(--chalk);
+    font-size:1.05rem;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .month-label{
+    font-family:'Heebo', sans-serif;
+    font-weight:700;
+    font-size:0.95rem;
+    color:var(--chalk);
+  }
+  .calendar-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.8rem;
+    margin-bottom:0.7rem;
+    font-size:0.72rem;
+    color:var(--chalk);
+    opacity:0.85;
+  }
+  .calendar-legend span{ display:flex; align-items:center; gap:0.3rem; }
+  .calendar-legend .dot{ width:0.6rem; height:0.6rem; border-radius:50%; display:inline-block; }
+  .calendar-legend .dot.workday{ background:var(--mint); }
+  .calendar-legend .dot.holiday{ background:var(--coral); }
+  .calendar-legend .dot.personal{ background:var(--lilac); }
+  .calendar-grid{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    gap:0.3rem;
+  }
+  .calendar-weekday{
+    text-align:center;
+    font-size:0.66rem;
+    font-weight:600;
+    color:var(--muted);
+    padding-bottom:0.25rem;
+  }
+  .calendar-day{
+    aspect-ratio:1;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.76rem;
+    font-weight:600;
+    color:var(--chalk);
+    background:var(--panel-2);
+    border:1.5px solid var(--panel-border);
+  }
+  .calendar-day.empty{ background:transparent; border-color:transparent; }
+  .calendar-day.rest{ opacity:0.5; }
+  .calendar-day.workday{ background:var(--mint); border-color:var(--mint); color:#123038; }
+  .calendar-day.holiday{ background:var(--coral); border-color:var(--coral); color:#123038; }
+  .calendar-day.personal{ background:var(--lilac); border-color:var(--lilac); color:#123038; }
+  .calendar-day.today{ box-shadow:0 0 0 2px var(--outline) inset; }
+
   /* overview list */
   .overview{
     display:flex;
@@ -571,8 +659,28 @@
   </section>
 
   <section class="block">
+    <h2>לוח חודשי</h2>
+    <button id="calendarToggle" class="calendar-toggle">הצג/הסתר לוח</button>
+    <div class="month-calendar" id="monthCalendar" style="display:none;">
+      <div class="month-nav">
+        <button id="monthPrev" aria-label="חודש קודם">‹</button>
+        <div class="month-label" id="monthLabel"></div>
+        <button id="monthNext" aria-label="חודש הבא">›</button>
+      </div>
+      <div class="calendar-legend">
+        <span><i class="dot workday"></i> יום עבודה</span>
+        <span><i class="dot holiday"></i> חג לכולם</span>
+        <span><i class="dot personal"></i> חופש רק לי</span>
+      </div>
+      <div class="calendar-grid" id="calendarWeekdays"></div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+  </section>
+
+  <section class="block">
     <h2>מבט מהיר על כל החופשות</h2>
-    <div class="overview" id="overviewList"></div>
+    <button id="overviewToggle" class="calendar-toggle">הצג/הסתר תצוגה</button>
+    <div class="overview" id="overviewList" style="display:none; margin-top:0.9rem;"></div>
   </section>
 
   <footer class="signature">נוצר ע"י גלי זייצ'יק</footer>
@@ -608,6 +716,7 @@ let state = {
   workdays: [true,true,true,true,true,true,false], // default: school week, Sunday to Friday
   theme: 'day',
   fontScale: 100,
+  calendarMonth: null, // { year, month } currently shown in the month calendar, month is 0-based
 };
 
 function todayMidnight(){
@@ -621,6 +730,13 @@ function parseDate(str){
   const d = new Date(y, m-1, day);
   d.setHours(0,0,0,0);
   return d;
+}
+
+function formatDateKey(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 
 function totalDaysBetween(from, to){
@@ -771,6 +887,88 @@ function renderOverview(today){
   });
 }
 
+// returns the vacation object covering this date, or null
+function holidayForDate(d){
+  return VACATIONS.find(v => {
+    const start = parseDate(v.start);
+    const end = parseDate(v.end || v.start);
+    return d >= start && d <= end;
+  }) || null;
+}
+
+const CALENDAR_WEEKDAY_LETTERS = ['א','ב','ג','ד','ה','ו','ש'];
+
+function renderCalendarWeekdays(){
+  const row = document.getElementById('calendarWeekdays');
+  row.innerHTML = CALENDAR_WEEKDAY_LETTERS
+    .map(letter => `<div class="calendar-weekday">${letter}</div>`)
+    .join('');
+}
+
+function renderMonthCalendar(){
+  if(!state.calendarMonth) return;
+  const { year, month } = state.calendarMonth;
+  const label = new Date(year, month, 1).toLocaleDateString('he-IL', { month:'long', year:'numeric' });
+  document.getElementById('monthLabel').textContent = label;
+
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
+
+  const today = todayMidnight();
+  const firstDay = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const leadingEmpty = firstDay.getDay();
+
+  for(let i = 0; i < leadingEmpty; i++){
+    const empty = document.createElement('div');
+    empty.className = 'calendar-day empty';
+    grid.appendChild(empty);
+  }
+
+  for(let day = 1; day <= daysInMonth; day++){
+    const d = new Date(year, month, day);
+    d.setHours(0,0,0,0);
+    const key = formatDateKey(d);
+    const holiday = holidayForDate(d);
+    const isWorkday = state.workdays[d.getDay()];
+    const isSaturday = d.getDay() === 6; // universal weekly rest day, regardless of her personal pattern
+
+    const cell = document.createElement('div');
+    cell.textContent = String(day);
+    cell.dataset.date = key;
+
+    let cls = 'calendar-day';
+    if(holiday){
+      cls += ' holiday';
+    } else if(isSaturday){
+      cls += ' rest';
+    } else if(isWorkday){
+      cls += ' workday';
+    } else {
+      cls += ' personal';
+    }
+    if(d.getTime() === today.getTime()) cls += ' today';
+    cell.className = cls;
+
+    grid.appendChild(cell);
+  }
+}
+
+function shiftCalendarMonth(delta){
+  let { year, month } = state.calendarMonth;
+  month += delta;
+  if(month < 0){ month = 11; year -= 1; }
+  if(month > 11){ month = 0; year += 1; }
+  state.calendarMonth = { year, month };
+  renderMonthCalendar();
+}
+
+function initCalendarMonthFromTarget(){
+  const target = currentTarget();
+  const targetDate = parseDate(target.start);
+  state.calendarMonth = { year: targetDate.getFullYear(), month: targetDate.getMonth() };
+}
+
 function buildChips(){
   const row = document.getElementById('chipsRow');
   row.innerHTML = '';
@@ -822,6 +1020,7 @@ function buildDaysPicker(){
       }
       saveWorkdays();
       render();
+      renderMonthCalendar();
     });
     picker.appendChild(btn);
   });
@@ -971,6 +1170,28 @@ if('serviceWorker' in navigator){
   });
 }
 
+document.getElementById('calendarToggle').addEventListener('click', () => {
+  const panel = document.getElementById('monthCalendar');
+  const btn = document.getElementById('calendarToggle');
+  const opening = panel.style.display === 'none';
+  panel.style.display = opening ? 'block' : 'none';
+  btn.classList.toggle('active', opening);
+  if(opening){
+    if(!state.calendarMonth) initCalendarMonthFromTarget();
+    renderMonthCalendar();
+  }
+});
+document.getElementById('monthPrev').addEventListener('click', () => shiftCalendarMonth(-1));
+document.getElementById('monthNext').addEventListener('click', () => shiftCalendarMonth(1));
+
+document.getElementById('overviewToggle').addEventListener('click', () => {
+  const list = document.getElementById('overviewList');
+  const btn = document.getElementById('overviewToggle');
+  const opening = list.style.display === 'none';
+  list.style.display = opening ? '' : 'none';
+  btn.classList.toggle('active', opening);
+});
+
 async function init(){
   await loadState();
   applyTheme();
@@ -978,6 +1199,7 @@ async function init(){
   buildChips();
   buildDaysPicker();
   buildModeToggle();
+  renderCalendarWeekdays();
   document.querySelectorAll('#modeToggle button').forEach(b => {
     b.classList.toggle('active', b.dataset.mode === state.mode);
   });
