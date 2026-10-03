@@ -588,18 +588,37 @@
     text-align:right;
   }
   .overview-row .next-holiday-note{
-    font-size:0.62rem;
-    color:var(--muted);
-    opacity:0.8;
-    margin-top:0.15rem;
+    font-size:0.78rem;
+    line-height:1.45;
+    color:var(--chalk);
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:10px;
+    padding:0.4rem 0.65rem;
+    margin-top:0.55rem;
     text-align:right;
+  }
+  .overview-row .next-holiday-note b{
+    font-family:'Suez One', serif;
+    font-weight:400;
+    font-size:1rem;
+    color:var(--yellow);
+    margin-inline-start:0.15rem;
   }
   .overview-row .count{
     font-family:'Suez One', serif;
-    font-size:1.05rem;
+    font-size:1.65rem;
+    line-height:1;
     color:var(--coral);
+    /* dark outline around the number so it stands out from the background */
+    text-shadow:
+      -1.5px -1.5px 0 #0A2F3A, 0 -1.5px 0 #0A2F3A, 1.5px -1.5px 0 #0A2F3A,
+      -1.5px 0 0 #0A2F3A,                           1.5px 0 0 #0A2F3A,
+      -1.5px 1.5px 0 #0A2F3A,  0 1.5px 0 #0A2F3A,  1.5px 1.5px 0 #0A2F3A,
+      0 2px 4px rgba(0,0,0,0.35);
   }
   .overview-row .count span{
+    text-shadow:none;
     font-family:'Heebo', sans-serif;
     font-size:0.72rem;
     color:var(--muted);
@@ -768,13 +787,13 @@
   </section>
 
   <section class="block">
-    <h2>מבט מהיר על כל החופשות</h2>
+    <h2>ספירה לאחור לכל החופשות</h2>
     <button id="overviewToggle" class="calendar-toggle">הצג/הסתר תצוגה</button>
     <div class="overview" id="overviewList" style="display:none; margin-top:0.9rem;"></div>
   </section>
 
     <section class="block" id="schedule">
-    <h2>לוח חופשות תשפ״ז</h2>
+    <h2>תאריכי החופשות בשנת הלימודים תשפ״ז</h2>
     <details class="schedule">
       <summary class="calendar-toggle">הצג/הסתר תצוגה</summary>
       <div class="schedule-panel">
@@ -964,7 +983,7 @@ function nextHolidayNote(v){
   const toD = parseDate(next.start);
   toD.setDate(toD.getDate() - 1);
   const work = workdaysBetween(fromD, toD, state.workdays);
-  return `<div class="next-holiday-note">החג הבא: ${next.label}. ימי עבודה מ${v.label} עד ${next.label}: ${work}</div>`;
+  return `<div class="next-holiday-note">החג הבא: ${next.label}. ימי עבודה מ${v.label} עד ${next.label}: <b>${work}</b></div>`;
 }
 
 function renderOverview(today){
